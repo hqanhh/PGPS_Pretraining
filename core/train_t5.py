@@ -28,7 +28,7 @@ def main_worker(args):
     src_lang, tgt_lang = get_language(args)
     train_loader, train_sampler, val_loader, src_lang, tgt_lang = get_dataloader(args)
     model = Network(args, src_lang, tgt_lang).cuda()
-    optimizer = AdamW(model.parameters(), lr=args.learning_rate)
+    optimizer = AdamW(model.parameters(), lr=args.lr)
     total_steps = len(train_loader) * args.num_train_epochs
     scheduler = get_linear_schedule_with_warmup(optimizer, num_warmup_steps=0, num_training_steps=total_steps)
 
