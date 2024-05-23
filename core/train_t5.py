@@ -37,7 +37,7 @@ class CustomDataset(Dataset):
         return src_input, tgt_input
 
 def get_dataloader(args):
-    raw_pairs = get_raw_pairs(args.dataset_path)
+    raw_pairs = get_raw_pairs(args.dataset_dir)
     train_size = int(0.8 * len(raw_pairs))
     val_size = len(raw_pairs) - train_size
     train_dataset = CustomDataset(raw_pairs[:train_size], args.src_lang, args.tgt_lang)
