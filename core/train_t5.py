@@ -29,7 +29,7 @@ def main_worker(args):
     train_loader, train_sampler, val_loader, src_lang, tgt_lang = get_dataloader(args)
     model = Network(args, src_lang, tgt_lang).cuda()
     optimizer = AdamW(model.parameters(), lr=args.lr)
-    total_steps = len(train_loader) * args.num_train_epochs
+    total_steps = len(train_loader) * args.max_epoch
     scheduler = get_linear_schedule_with_warmup(optimizer, num_warmup_steps=0, num_training_steps=total_steps)
 
     model = torch.nn.parallel.DistributedDataParallel(
@@ -41,10 +41,10 @@ def main_worker(args):
 
     model.train()
 
-    for epoch in range(args.num_train_epochs):
+    for epoch in range(args.max_epoch):
         for step, batch in enumerate(train_loader):
-            inputs = batch['token'].to(args.device)
-            labels = batch['labels'].to(args.device)
+            inputs = batch['token'].cuda()
+            labels = batch['labels'].cuda()
 
             model.zero_grad()
             outputs = model(inputs, labels=labels)
@@ -53,7 +53,7 @@ def main_worker(args):
             optimizer.step()
             scheduler.step()
 
-            if step % args.logging_steps == 0:
-                print(f"Epoch {epoch}, Step {step}, Loss {loss.item()}")
+            
+            print(f"Epoch {epoch}, Step {step}, Loss {loss.item()}")
 
     print("Training completed.")
