@@ -17,8 +17,8 @@ def set_seed(args):
         torch.cuda.manual_seed_all(args.seed)
 
 def get_language(args):
-    src_lang = SrcLang(args.src_vocab_path)
-    tgt_lang = TgtLang(args.tgt_vocab_path)
+    src_lang = SrcLang(args.vocab_src_path)
+    tgt_lang = TgtLang(args.vocab_tgt_path)
     return src_lang, tgt_lang
 
 class CustomDataset(Dataset):
