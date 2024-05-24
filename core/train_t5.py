@@ -9,51 +9,69 @@ from core.network_t5 import Network
 from datasets.preprocessing_t5 import SrcLang, TgtLang, get_raw_pairs, Collater
 from datasets import get_dataloader
 
-# Utility functions
-def set_seed(args):
-    random.seed(args.seed)
-    np.random.seed(args.seed)
-    torch.manual_seed(args.seed)
-    if torch.cuda.is_available():
-        torch.cuda.manual_seed_all(args.seed)
+# # Utility functions
+# def set_seed(args):
+#     random.seed(args.seed)
+#     np.random.seed(args.seed)
+#     torch.manual_seed(args.seed)
+#     if torch.cuda.is_available():
+#         torch.cuda.manual_seed_all(args.seed)
 
-def get_language(args):
-    src_lang = SrcLang(args.vocab_src_path)
-    tgt_lang = TgtLang(args.vocab_tgt_path)
-    return src_lang, tgt_lang
+# def get_language(args):
+#     src_lang = SrcLang(args.vocab_src_path)
+#     tgt_lang = TgtLang(args.vocab_tgt_path)
+#     return src_lang, tgt_lang
 
-# Training script
-def main_worker(args):
-    set_seed(args)
-    src_lang, tgt_lang = get_language(args)
-    train_loader, train_sampler, val_loader, src_lang, tgt_lang = get_dataloader(args)
-    model = Network(args, src_lang, tgt_lang).cuda()
-    optimizer = AdamW(model.parameters(), lr=args.lr)
-    total_steps = len(train_loader) * args.max_epoch
-    scheduler = get_linear_schedule_with_warmup(optimizer, num_warmup_steps=0, num_training_steps=total_steps)
+# # Training script
+# def main_worker(args):
+#     set_seed(args)
+#     src_lang, tgt_lang = get_language(args)
+#     train_loader, train_sampler, val_loader, src_lang, tgt_lang = get_dataloader(args)
+#     model = Network(args, src_lang, tgt_lang).cuda()
+#     optimizer = AdamW(model.parameters(), lr=args.lr)
+#     total_steps = len(train_loader) * args.max_epoch
+#     scheduler = get_linear_schedule_with_warmup(optimizer, num_warmup_steps=0, num_training_steps=total_steps)
 
-    model = torch.nn.parallel.DistributedDataParallel(
-        model, 
-        device_ids=[args.local_rank], 
-        output_device=args.local_rank, 
-        find_unused_parameters=True
-    )
+#     model = torch.nn.parallel.DistributedDataParallel(
+#         model, 
+#         device_ids=[args.local_rank], 
+#         output_device=args.local_rank, 
+#         find_unused_parameters=True
+#     )
 
-    model.train()
+#     model.train()
 
-    for epoch in range(args.max_epoch):
-        for step, batch in enumerate(train_loader):
-            inputs = batch['token'].cuda()
-            labels = batch['labels'].cuda()
+#     for epoch in range(args.max_epoch):
+#         for step, batch in enumerate(train_loader):
+#             inputs = batch['token'].cuda()
+#             labels = batch['labels'].cuda()
 
-            model.zero_grad()
-            outputs = model(inputs, labels=labels)
-            loss = outputs.loss
-            loss.backward()
-            optimizer.step()
-            scheduler.step()
+#             model.zero_grad()
+#             outputs = model(inputs, labels=labels)
+#             loss = outputs.loss
+#             loss.backward()
+#             optimizer.step()
+#             scheduler.step()
 
             
-            print(f"Epoch {epoch}, Step {step}, Loss {loss.item()}")
+#             print(f"Epoch {epoch}, Step {step}, Loss {loss.item()}")
 
-    print("Training completed.")
+#     print("Training completed.")
+
+from transformers import AdamW, get_linear_schedule_with_warmup
+
+def train(args, epoch, train_loader, model, criterion, optimizer, data_collator, scheduler):
+    model.train()
+    total_loss = 0
+    for step, batch in enumerate(train_loader):
+        inputs = {k: v.cuda() for k, v in batch.items() if k != 'labels'}
+        labels = batch['labels'].cuda()
+        outputs = model(**inputs, labels=labels)
+        loss = outputs.loss
+        loss.backward()
+        optimizer.step()
+        scheduler.step()
+        optimizer.zero_grad()
+        total_loss += loss.item()
+    
+    return total_loss / len(train_loader)
