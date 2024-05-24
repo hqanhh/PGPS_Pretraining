@@ -93,9 +93,13 @@ class MyDataset(torch.utils.data.Dataset):
                             get_text_index(combine_text, self.src_lang)
         
         # Prepare the text and target fields for tokenization
+        # return {
+        #     'text': pair['text'],
+        #     'target': pair['expression']
+        # }
         return {
-            'text': pair['text'],
-            'target': pair['expression']
+            'text': ' '.join(pair['text'].token),  # Convert list of tokens to string
+            'target': ' '.join(pair['expression'])  # Convert list of target tokens to string
         }
        
     def __len__(self):
