@@ -59,10 +59,12 @@ import torch
 import torch.distributed as dist
 from torch.utils.data import DataLoader, DistributedSampler
 from transformers import T5Tokenizer, get_linear_schedule_with_warmup
-from core.train import get_model, get_optimizer, get_criterion, train, save_checkpoint
+from core.train_t5 import get_optimizer, train, save_checkpoint
 import torch.backends.cudnn as cudnn
 import random
 from datasets import get_dataloader
+from core.network_t5 import get_model
+from loss import get_criterion
 
 def main_worker(gpu, ngpus_per_node, args):
     args.gpu = gpu
