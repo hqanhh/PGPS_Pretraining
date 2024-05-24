@@ -4,7 +4,7 @@ import torch
 from torch.utils.data import DataLoader, Dataset
 from transformers import T5ForConditionalGeneration, AdamW, get_linear_schedule_with_warmup
 from utils.utils import *
-from core.worker import train
+from core.worker_t5 import train
 # from core.network_t5 import Network
 from datasets.preprocessing_t5 import SrcLang, TgtLang, get_raw_pairs, Collater
 from datasets import get_dataloader
