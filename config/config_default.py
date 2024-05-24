@@ -60,7 +60,7 @@ def get_parser():
     parser.add_argument('--vocab_src_path', default='./vocab/vocab_src.txt')
     parser.add_argument('--vocab_tgt_path', default='./vocab/vocab_tgt.txt')
     parser.add_argument('--pretrain_emb_path', default='')
-    parser.add_argument('--batch_size', default=128, type=int)
+    parser.add_argument('--batch_size', default=64, type=int)
     parser.add_argument('--random_prob', default=0.7, type=float)
     parser.add_argument('--without_stru', action='store_true', help='structure clauses are used or not')
     parser.add_argument('--trim_min_count', default=5, type=int, help='minimum number of word')
