@@ -99,7 +99,7 @@ class MyDataset(torch.utils.data.Dataset):
         #     'target': pair['expression']
         # }
         return {
-            'text': ' '.join(pair['text'].token) +  ' '.join(pair['parsing_stru_seqs'].token) + ' '.join(pair['parsing_sem_seqs'].token),  # Convert list of tokens to string
+            'text': ' '.join([item for sublist in pair['parsing_stru_seqs'].token for item in (sublist if isinstance(sublist, list) else [sublist])]) + ' '.join([item for sublist in pair['parsing_sem_seqs'].token for item in (sublist if isinstance(sublist, list) else [sublist])]) + ' '.join(pair['text'].token),  # Convert list of tokens to string
             'target': ' '.join(pair['expression'])  # Convert list of target tokens to string
         }
        
