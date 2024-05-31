@@ -79,6 +79,7 @@ class MyDataset(torch.utils.data.Dataset):
         
     def __getitem__(self, idx):
         pair = self.pairs[idx]
+        print(pair)
         self.text_transform(pair['text'], 
                             pair['parsing_stru_seqs'], 
                             pair['parsing_sem_seqs'],
