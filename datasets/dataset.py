@@ -98,7 +98,7 @@ class MyDataset(torch.utils.data.Dataset):
         #     'target': pair['expression']
         # }
         return {
-            'text': ' '.join(pair['text'].token),  # Convert list of tokens to string
+            'text': ' '.join(pair['text'], pair['parsing_stru_seqs'], pair['parsing_sem_seqs']),  # Convert list of tokens to string
             'target': ' '.join(pair['expression'])  # Convert list of target tokens to string
         }
        
