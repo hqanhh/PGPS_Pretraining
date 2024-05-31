@@ -80,8 +80,6 @@ def get_dataloader(args):
     train_data = MyDataset(args, train_pairs, src_lang, tgt_lang, is_train=True)
 
     def collate_fn(batch):
-        for item in batch:
-            print(item)
         input_texts = [item['text'] for item in batch]
         target_texts = [item['target'] for item in batch]
         model_inputs = tokenizer(input_texts, max_length=args.max_seq_length, truncation=True, padding="max_length", return_tensors="pt")
